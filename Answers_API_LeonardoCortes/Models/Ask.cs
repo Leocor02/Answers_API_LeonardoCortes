@@ -1,5 +1,9 @@
-﻿using System;
+﻿using Microsoft.DotNet.Scaffolding.Shared.CodeModifier.CodeChange;
+using Newtonsoft.Json;
+using System;
 using System.Collections.Generic;
+using System.Net.Mime;
+using System.Net;
 
 namespace Answers_API_LeonardoCortes.Models
 {
@@ -22,5 +26,6 @@ namespace Answers_API_LeonardoCortes.Models
         public virtual AskStatus AskStatus { get; set; } = null!;
         public virtual User User { get; set; } = null!;
         public virtual ICollection<Answer> Answers { get; set; }
+
     }
 }

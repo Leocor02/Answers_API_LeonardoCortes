@@ -6,6 +6,8 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Answers_API_LeonardoCortes.Models;
+using Answers_API_LeonardoCortes.Models.DTOs;
+using Microsoft.EntityFrameworkCore.Metadata.Internal;
 
 namespace Answers_API_LeonardoCortes.Controllers
 {
@@ -27,8 +29,59 @@ namespace Answers_API_LeonardoCortes.Controllers
             return await _context.Users.ToListAsync();
         }
 
-        // GET: api/Users/5
-        [HttpGet("{id}")]
+        // GET: api/Users/GetUserInfo?id=3'
+        [HttpGet("GetUserInfo")]
+        public ActionResult<IEnumerable<UserDTO>> GetUserInfo(int id)
+        {
+            var query = (from u in _context.Users
+                         join r in _context.UserRoles on u.UserRoleId equals r.UserRoleId
+                         join c in _context.Countries on u.CountryId equals c.CountryId
+                         where u.UserId == id
+                         select new
+                         {
+                             idusuario = u.UserId,
+                             nombreusuario = u.UserName,
+                             nombre = u.FirstName,
+                             apellido = u.LastName,
+                             numerotelefono = u.PhoneNumber,
+                             cantidadstrike = u.StrikeCount,
+                             correorrespaldo = u.BackUpEmail,
+                             descripciontrabajo = u.JobDescription,
+                             idestatususuario = u.UserStatusId,
+                             idpais = c.CountryId,
+                             idrol = r.UserRoleId
+                         }).ToList();
+
+            List<UserDTO> list = new List<UserDTO>();
+
+            foreach (var item in query)
+            {
+                UserDTO NewItem = new UserDTO();
+
+                NewItem.IDUsuario = item.idusuario;
+                NewItem.NombreUsuario = item.nombreusuario;
+                NewItem.Nombre = item.nombre;
+                NewItem.Apellido = item.apellido;
+                NewItem.NumeroTelefono = item.numerotelefono;
+                NewItem.CantidadStrike = item.cantidadstrike;
+                NewItem.CorreoRespaldo = item.correorrespaldo;
+                NewItem.DescripcionTrabajo = item.descripciontrabajo;
+                NewItem.IDPais = item.idpais;
+                NewItem.IDRol = item.idrol;
+                list.Add(NewItem);
+            }
+
+            if (list == null)
+            {
+                return NotFound();
+            }
+
+            return list;
+        }
+
+
+// GET: api/Users/5
+[HttpGet("{id}")]
         public async Task<ActionResult<User>> GetUser(int id)
         {
             var user = await _context.Users.FindAsync(id);
